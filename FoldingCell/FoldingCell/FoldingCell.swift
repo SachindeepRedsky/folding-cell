@@ -93,13 +93,18 @@ open class FoldingCell: UITableViewCell {
             foregroundViewTop.constant += height / 2
         }
         foregroundView.layer.transform = foregroundView.transform3d()
-        
+        				print("configureDefaultState:::before:::createAnimationView")
+
+
         createAnimationView()
         contentView.bringSubviewToFront(foregroundView)
+        				print("configureDefaultState:::after:::createAnimationView")
+
     }
     
     private func createAnimationItemView() -> [RotatedView] {
-        
+                				print("inside:::createAnimationItemView")
+
         var items = [RotatedView]()
         items.append(foregroundView)
         var rotatedViews = [RotatedView]()
@@ -116,6 +121,8 @@ open class FoldingCell: UITableViewCell {
         }
         
         items.append(contentsOf: rotatedViews)
+                        				print("inside:::createAnimationItemView:::end")
+
         return items
     }
     
@@ -143,11 +150,17 @@ open class FoldingCell: UITableViewCell {
         animationView?.backgroundColor = .clear
         animationView?.translatesAutoresizingMaskIntoConstraints = false
         animationView?.alpha = 0
-        
+          				print("createAnimationView:::after:::animationView::creation:::")
+
+          				print("createAnimationView:::after:::animationView::creation:::", animationView)
+
+
         guard let animationView = self.animationView else { return }
         
         self.contentView.addSubview(animationView)
         
+          				print("createAnimationView:::after:::animationView::addedtocontentview:::")
+
         // copy constraints from containerView
         var newConstraints = [NSLayoutConstraint]()
         for constraint in self.contentView.constraints {
@@ -157,15 +170,20 @@ open class FoldingCell: UITableViewCell {
                                                        multiplier: constraint.multiplier, constant: constraint.constant)
                 
                 newConstraints.append(newConstraint)
+          				print("createAnimationView:::if::appended")
+
             } else if let firstItem = constraint.firstItem as? UIView, let secondItem: UIView = constraint.secondItem as? UIView, secondItem == containerView {
                 let newConstraint = NSLayoutConstraint(item: firstItem, attribute: constraint.firstAttribute,
                                                        relatedBy: constraint.relation, toItem: animationView, attribute: constraint.secondAttribute,
                                                        multiplier: constraint.multiplier, constant: constraint.constant)
                 
                 newConstraints.append(newConstraint)
+          				print("createAnimationView:::else::appended")
+
             }
         }
         self.contentView.addConstraints(newConstraints)
+          				print("createAnimationView:::addede::newConstraints")
         
         for constraint in containerView.constraints { // added height constraint
             if constraint.firstAttribute == .height, let item: UIView = constraint.firstItem as? UIView, item == containerView {
@@ -176,9 +194,13 @@ open class FoldingCell: UITableViewCell {
                 animationView.addConstraint(newConstraint)
             }
         }
+          				print("createAnimationView:::addede::newConstraints::after:::containerView")
+
     }
     
     func addImageItemsToAnimationView() {
+                          				print("inside::addImageItemsToAnimationView")
+
         containerView.alpha = 1
         let containerViewSize = containerView.bounds.size
         let foregroundViewSize = foregroundView.bounds.size
@@ -245,15 +267,20 @@ open class FoldingCell: UITableViewCell {
             }
         }
         animationItemViews = createAnimationItemView()
+                                  				print("::addImageItemsToAnimationView:::end")
+
     }
     
     fileprivate func removeImageItemsFromAnimationView() {
-        
+                  				print("inside::removeImageItemsFromAnimationView")
+
         guard let animationView = self.animationView else {
             return
         }
         
         animationView.subviews.forEach({ $0.removeFromSuperview() })
+                          				print("inside::removeImageItemsFromAnimationView:::end")
+
     }
     
     // MARK: public
@@ -265,6 +292,11 @@ open class FoldingCell: UITableViewCell {
     ///   - animated: animate changes.
     ///   - completion: A block object to be executed when the animation sequence ends.
     @objc open func unfold(_ value: Bool, animated: Bool = true, completion: (() -> Void)? = nil) {
+          				print("uunfold::")
+          				print("uunfold::", value,animated)
+
+
+        
         if animated {
             value ? openAnimation(completion) : closeAnimation(completion)
         } else {
@@ -297,22 +329,33 @@ open class FoldingCell: UITableViewCell {
     }
     
     func openAnimation(_ completion: (() -> Void)?) {
+                  				print("openAnimation::")
+
         isUnfolded = true
         removeImageItemsFromAnimationView()
+                  				print("openAnimation::after:::removeImageItemsFromAnimationView")
+
         addImageItemsToAnimationView()
         
+                  				print("openAnimation::after:::addImageItems")
+
+
         animationView?.alpha = 1
         containerView.alpha = 0
         
         let durations = durationSequence(.open)
+                          				print("openAnimation::after:::durationSequence")
         
         var delay: TimeInterval = 0
         var timing = convertFromCAMediaTimingFunctionName(CAMediaTimingFunctionName.easeIn)
+                                  				print("openAnimation::after:::convertFromCAMediaTimingFunctionName")
+
         var from: CGFloat = 0.0
         var to: CGFloat = -CGFloat.pi / 2
         var hidden = true
         configureAnimationItems(.open)
-        
+                                        				print("openAnimation::after:::configureAnimationItems")
+  
         guard let animationItemViews = self.animationItemViews else {
             return
         }
@@ -341,6 +384,8 @@ open class FoldingCell: UITableViewCell {
             self.containerView.alpha = 1
             completion?()
         }
+                          				print("openAnimation::end")
+
     }
     
     func closeAnimation(_ completion: (() -> Void)?) {
